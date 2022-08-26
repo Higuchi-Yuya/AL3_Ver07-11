@@ -17,7 +17,7 @@ class Player {
 	~Player();
 
 	//初期化
-	void Initialize(Model* model, uint32_t textureHandle);
+	void Initialize(Model* model);
 
 	//更新
 	void Update();
@@ -45,6 +45,11 @@ class Player {
 	/// UI描画
 	/// </summary>
 	void DrawUI();
+
+	void SetIsDead(bool flag);
+
+	// 死亡フラグの取得
+	bool IsDead() const { return isDead_; }
 
   private:
 	//移動処理
@@ -95,4 +100,11 @@ class Player {
 	// 2Dレティクル用スプライト
 	std::unique_ptr<Sprite> sprite2DReticle_;
 	
+	int timer = 0;
+
+	// プレイヤーの体力
+	int life = 5;
+
+	//デスフラグ
+	bool isDead_ = false;
 };

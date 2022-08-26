@@ -11,7 +11,7 @@ void RailCamera::Initialize(WorldTransform worldTransform) {
 	debugText_ = DebugText::GetInstance();
 
 
-	viewProjection_.farZ = 100.0f;
+	viewProjection_.farZ = 1000.0f;
 	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 }
@@ -21,10 +21,14 @@ void RailCamera::Update() {
 	Affine_trans* trans = nullptr;
 	Vector3 move = {0, 0, 0};
 	Vector3 rotate = {0, 0, 0};
-
-	// カメラオブジェの移動処理
-	move = {0.0f, 0.0f, -moveSpeed_.z};
-	//worldTransform_.translation_ += move;
+	
+	if (cameraMoveFlag_ == true)
+	{
+		// カメラオブジェの移動処理
+		move = { 0.0f, 0.0f, +moveSpeed_.z };
+		worldTransform_.translation_ += move;
+	}
+	
 
 	// カメラオブジェの回転処理
 	rotate = {0.0f, +rotateSpeed_.y, 0.0f};
@@ -65,22 +69,32 @@ void RailCamera::Update() {
 #pragma endregion
 
 #pragma region デバッグテキスト
-	//デバッグテキスト表示
-	debugText_->SetPos(50, 180);
-	debugText_->Printf(
-	  "Eye:(%f,%f,%f)", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
-	debugText_->SetPos(50, 200);
-	debugText_->Printf(
-	  "Target:(%f,%f,%f)", viewProjection_.target.x, viewProjection_.target.y,viewProjection_.target.z);
-	debugText_->SetPos(50, 220);
-	debugText_->Printf("Forward:(%f,%f,%f)", forward.x, forward.y, forward.z);
-	debugText_->SetPos(50, 240);
-	debugText_->Printf("Up:(%f,%f,%f)", up.x, up.y, up.z);
+	////デバッグテキスト表示
+	//debugText_->SetPos(50, 120);
+	//debugText_->Printf(
+	//  "Eye:(%f,%f,%f)", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
+	//debugText_->SetPos(50, 140);
+	//debugText_->Printf(
+	//  "Target:(%f,%f,%f)", viewProjection_.target.x, viewProjection_.target.y,viewProjection_.target.z);
+	//debugText_->SetPos(50, 160);
+	//debugText_->Printf("Forward:(%f,%f,%f)", forward.x, forward.y, forward.z);
+	//debugText_->SetPos(50, 180);
+	//debugText_->Printf("Up:(%f,%f,%f)", up.x, up.y, up.z);
+
+	//debugText_->SetPos(50, 320);
+	//debugText_->Printf(
+	//  "postion:(%f,%f,%f)", worldTransform_.translation_.x, worldTransform_.translation_.y,
+	//  worldTransform_.translation_.z);
 #pragma endregion
 }
 
 ViewProjection RailCamera::GetViewProjection() { return viewProjection_; }
 
 WorldTransform* RailCamera::GetWorldTransform() { return &worldTransform_; }
+
+void RailCamera::SetcameraMoveFlag(bool flag)
+{
+	cameraMoveFlag_ = flag;
+}
 
 

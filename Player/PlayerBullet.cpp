@@ -18,6 +18,10 @@ void PlayerBullet::Initialize(Model* model, const WorldTransform worldTransform,
 	worldTransform_.translation_ = {
 	  worldTransform.matWorld_.m[3][0], worldTransform.matWorld_.m[3][1],
 	  worldTransform.matWorld_.m[3][2]};
+	
+	worldTransform_.scale_.x = 0.6;
+	worldTransform_.scale_.y = 0.6;
+	worldTransform_.scale_.z = 0.6;
 
 }
 

@@ -15,6 +15,9 @@ class RailCamera
 
 	WorldTransform* GetWorldTransform();
 
+	bool cameraMoveFlag() const { return cameraMoveFlag_; }
+
+	void SetcameraMoveFlag(bool flag);
 
   private:
 	// ワールド変換データ
@@ -24,7 +27,10 @@ class RailCamera
 	ViewProjection viewProjection_;
 
 	// オブジェクトの動くスピード
-	Vector3 moveSpeed_ = {0.01f, 0.01f, 0.04f};
+	Vector3 moveSpeed_ = {0.01f, 0.01f, 0.03f};
 	Vector3 rotateSpeed_ = {0.05f, 0.001f, 0.05f};
 	DebugText* debugText_ = nullptr;
+
+	// カメラオブジェの移動フラグ
+	bool cameraMoveFlag_ = false;
 };

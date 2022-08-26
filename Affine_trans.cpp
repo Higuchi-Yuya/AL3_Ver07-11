@@ -122,13 +122,18 @@ void Affine_trans::Vec3conversion_W_Notincluded(Vector3& v, const Matrix4& m) {
 
 
 void Affine_trans::rotate(Matrix4& mat, float frequency_x, float frequency_y, float frequency_z) {
-	Matrix4 RotX, RotY, RotZ;
+	Matrix4 RotX, RotY, RotZ, Rot;
+
+	identity_matrix(RotX);
+	identity_matrix(RotY);
+	identity_matrix(RotZ);
+	identity_matrix(Rot);
 
 	rotateX(RotX, frequency_x);
 	rotateY(RotY, frequency_y);
 	rotateZ(RotZ, frequency_z);
 
-	identity_matrix(mat);
+
 
 	mat = RotZ * RotX * RotY;
 }

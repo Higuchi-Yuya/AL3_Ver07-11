@@ -96,29 +96,23 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Affine_trans.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Enemy\Enemy.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Enemy\EnemyBullet.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Player\Player.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Player\PlayerBullet.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\KamataEngine\DirectXGame\RailCamera.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Skydome.cpp" />
+    <ClCompile Include="Affine_trans.cpp" />
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\TextureManager.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
+    <ClCompile Include="Enemy\Enemy.cpp" />
+    <ClCompile Include="Enemy\EnemyBullet.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Matrix4.cpp" />
     <ClCompile Include="math\Vector3.cpp" />
+    <ClCompile Include="Player\Player.cpp" />
+    <ClCompile Include="Player\PlayerBullet.cpp" />
+    <ClCompile Include="RailCamera.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
+    <ClCompile Include="ScoreSprite.cpp" />
+    <ClCompile Include="Skydome.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Affine_trans.h" />
-    <ClInclude Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Enemy\Enemy.h" />
-    <ClInclude Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Enemy\EnemyBullet.h" />
-    <ClInclude Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Player\Player.h" />
-    <ClInclude Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Player\PlayerBullet.h" />
-    <ClInclude Include="..\..\..\..\..\..\KamataEngine\DirectXGame\RailCamera.h" />
-    <ClInclude Include="..\..\..\..\..\..\KamataEngine\DirectXGame\Skydome.h" />
     <ClInclude Include="2d\DebugText.h" />
     <ClInclude Include="2d\Sprite.h" />
     <ClInclude Include="3d\AxisIndicator.h" />
@@ -134,18 +128,26 @@
     <ClInclude Include="3d\SpotLight.h" />
     <ClInclude Include="3d\ViewProjection.h" />
     <ClInclude Include="3d\WorldTransform.h" />
+    <ClInclude Include="Affine_trans.h" />
     <ClInclude Include="audio\Audio.h" />
     <ClInclude Include="base\DirectXCommon.h" />
     <ClInclude Include="base\SafeDelete.h" />
     <ClInclude Include="base\TextureManager.h" />
     <ClInclude Include="base\WinApp.h" />
+    <ClInclude Include="Enemy\Enemy.h" />
+    <ClInclude Include="Enemy\EnemyBullet.h" />
     <ClInclude Include="input\Input.h" />
     <ClInclude Include="math\MathUtility.h" />
     <ClInclude Include="math\Matrix4.h" />
     <ClInclude Include="math\Vector2.h" />
     <ClInclude Include="math\Vector3.h" />
     <ClInclude Include="math\Vector4.h" />
+    <ClInclude Include="Player\Player.h" />
+    <ClInclude Include="Player\PlayerBullet.h" />
+    <ClInclude Include="RailCamera.h" />
     <ClInclude Include="scene\GameScene.h" />
+    <ClInclude Include="ScoreSprite.h" />
+    <ClInclude Include="Skydome.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Obj.hlsli" />

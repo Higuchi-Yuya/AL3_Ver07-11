@@ -20,7 +20,7 @@
 #include "Player.h"
 #include "Skydome.h"
 #include "RailCamera.h"
-
+#include "ScoreSprite.h"
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -76,7 +76,11 @@ public: // メンバ関数
 
 	void LoadEnemyPopData();
 
+	void ClearEnemyPopData();
+
 	void UpdateEnemyPopCommands();
+
+	void GameSceneInitialize();
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -104,8 +108,21 @@ private: // メンバ変数
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0;
 
+	// スコア
+	int score = 1000;
+
+	// スコア描画用変数
+	int div_score = 100000;
+	const int max_score_num = 5;
+	int score_num[5] = { 0 };
+	ScoreSprite scoreSprite_[5];
+	Vector2 pos = { 800, 200 };
+
+
 	//3Dモデル
 	Model* model_ = nullptr;
+
+	Model* modelPlayer_ = nullptr;
 
 	Model* modelSkydome_ = nullptr;
 
@@ -155,6 +172,16 @@ private: // メンバ変数
 	// 敵発生待機用変数
 	bool waitFlag = true;
 	int waitTimer = 120;
+
+
+	// 敵死亡カウント用変数
+	int enemy_deadcount = 0;
+
+
+	// シーン分けのフラグ
+	bool startscene_flag = true;
+	bool gamescene_flag = false;
+	bool resultscene_flag = false;
 
 	/// <summary>
 	/// ゲームシーン用
