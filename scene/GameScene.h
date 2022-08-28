@@ -82,6 +82,20 @@ public: // メンバ関数
 
 	void GameSceneInitialize();
 
+	void Sprite_Initalize();
+
+	void TitleSpriteDraw();
+
+	void GameSceneSpriteDraw();
+
+	void ResultSceneSpriteDraw();
+
+	void SceneChangeUpdate();
+
+	void SceneChangeDraw();
+
+	void SoundInitalize();
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -108,6 +122,9 @@ private: // メンバ変数
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0;
 
+
+	// スプライト
+
 	// スコア
 	int score = 1000;
 
@@ -116,8 +133,19 @@ private: // メンバ変数
 	const int max_score_num = 5;
 	int score_num[5] = { 0 };
 	ScoreSprite scoreSprite_[5];
-	Vector2 pos = { 800, 200 };
+	Vector2 pos = { 900, 55 };
 
+	// ライフ描画用変数
+	const int max_life_num = 1;
+	int life_num = 0;
+	int life_ = 0;
+	ScoreSprite lifeNumSprite;
+	Vector2 lifeNumPos = { 140,57 };
+
+	// リザルトスコア描画用変数
+	ScoreSprite result_scoreSprite_[5];
+	Vector2 resultScorePos = { 500, 330 };
+	Vector2 resultScoreSize = { 36,56 };
 
 	//3Dモデル
 	Model* model_ = nullptr;
@@ -182,6 +210,69 @@ private: // メンバ変数
 	bool startscene_flag = true;
 	bool gamescene_flag = false;
 	bool resultscene_flag = false;
+
+	// スプライト用の変数
+	std::unique_ptr<Sprite> title_name_;
+	std::unique_ptr<Sprite> title_button_;
+	std::unique_ptr<Sprite> flame_;
+	std::unique_ptr<Sprite> LifeF_;
+	std::unique_ptr<Sprite> ScoreF_;
+	std::unique_ptr<Sprite> result_flame_;
+	std::unique_ptr<Sprite> result_font_;
+	std::unique_ptr<Sprite> result_score_font_;
+	std::unique_ptr<Sprite> result_button_;
+
+	// スプライトのテクスチャ
+	uint32_t titleNameTextureHandle_ = 0;
+	uint32_t titleButtonTextureHandle_ = 0;
+	uint32_t flameTextureHandle_ = 0;
+	uint32_t scoreF_TextureHandle_ = 0; // ○○Fはフォントで、文字
+	uint32_t LifeF_TextureHandle_ = 0;
+	uint32_t result_flame_TextureHandle_ = 0;
+	uint32_t result_font_TextureHandle_ = 0;
+	uint32_t result_score_font_TextureHandle_ = 0;
+	uint32_t result_button_TextureHandle_ = 0;
+
+	Vector2 pos__ = { 0,0 };
+	Vector2 anker = { 0,0 };
+	Vector4 color = { 1,1,1,1 };
+
+	// ゲームシーンチェンジ用変数等
+	std::unique_ptr<Sprite> scene_change_up_;
+	std::unique_ptr<Sprite> scene_change_down_;
+
+	uint32_t scene_change_TextureHandle_ = 0;
+
+	Vector2 sceneChangeUpPos = { 0,-360 };
+	Vector2 sceneChangeDownPos = { 0,720 };
+
+	Vector2 scUpDestinationPos = { 0,-360 };
+	Vector2 scDownDestinationPos = { 360,720 };
+
+	
+	bool scCloseFlag = false;
+	bool scOpenFlag = false;
+
+	int sceneChangeSpeed = 4;
+
+	int sceneChangeTimer = 120;
+
+	// 音声ハンドル
+	uint32_t titleBgmSDHandle_ = 0;
+	uint32_t gameSceneBgmSDHandle_ = 0;
+	uint32_t resultSceneBgmSDHandle_ = 0;
+	
+
+	// 再生保存用ハンドル
+	uint32_t titleBgmVoiceHandle_ = 0;
+	uint32_t gameSceneBgmVoiceHandle_ = 0;
+	uint32_t resultSceneBgmVoiceHandle_ = 0;
+	
+
+	// 音声フラグ
+	bool titleBgmFlag = true;
+	bool gameSceneBgmFlag = false;
+	bool resultSceneBgmFlag = false;
 
 	/// <summary>
 	/// ゲームシーン用

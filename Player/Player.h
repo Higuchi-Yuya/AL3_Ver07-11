@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Audio.h"
 #include "DebugText.h"
 #include "Input.h"
 #include "Model.h"
@@ -51,6 +52,9 @@ class Player {
 	// 死亡フラグの取得
 	bool IsDead() const { return isDead_; }
 
+	// プレイヤーの体力の取得
+	int Life() const { return life; }
+
   private:
 	//移動処理
 	void Move();
@@ -74,6 +78,7 @@ class Player {
   private:
 	Input* input_ = nullptr;
 	DebugText* debugText_ = nullptr;
+	Audio* audio_ = nullptr;
 
 	//ワールド変換データ
 	WorldTransform worldTransform_;
@@ -107,4 +112,13 @@ class Player {
 
 	//デスフラグ
 	bool isDead_ = false;
+
+	// 弾発射効果音サウンドデータハンドル
+	uint32_t shotSeSDHandle_ = 0u;
+
+	// 弾発射効果音再生保存用ハンドル
+	uint32_t shotSeVoiceHandle_ = 0u;
+
+	// 弾発射効果音再生フラグ
+	bool shotSeFlag = false;
 };

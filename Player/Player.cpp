@@ -21,6 +21,10 @@ void Player::Initialize(Model* model) {
 	model_ = model;
 	textureHandle_ = TextureManager::Load("star/star_player.png");
 	
+	audio_ = Audio::GetInstance();
+
+	// 音声データ読み込み
+	shotSeSDHandle_ = audio_->LoadWave("SE/Shot.wav");
 
 	// レティクル用テクスチャ取得
 	uint32_t textureReticle_ = TextureManager::Load("2DReticle.png");
@@ -97,8 +101,13 @@ void Player::Attack() {
 	if (joyState.Gamepad.wButtons&XINPUT_GAMEPAD_RIGHT_SHOULDER)//input_->PushKey(DIK_Y)) {
 	{
 		timer--;
-		
+		shotSeFlag = true;
 		if (timer<=0) {
+			if (shotSeFlag == true)
+			{
+				shotSeVoiceHandle_ = audio_->PlayWave(shotSeSDHandle_,false,0.6);
+				shotSeFlag = false;
+			}
 
 			//弾の速度
 			const float kBulletSpeed = 0.3f;
@@ -177,8 +186,8 @@ void Player::SetWorldTransformParent(WorldTransform *worldtransform)
 void Player::Move() 
 {
 	Vector3 move = {0, 0, 0};
-	constexpr float MoveLimitX = 35;
-	constexpr float MoveLimitY = 19;
+	constexpr float MoveLimitX = 33;
+	constexpr float MoveLimitY = 18;
 
 	// ゲームパッドの状態を得る変数（XINPUT）
 	XINPUT_STATE joyState;
@@ -258,11 +267,11 @@ void Player::Trans_Update()
 void Player::Debug_Text() 
 {
 	//デバッグテキスト表示
-	debugText_->SetPos(50, 100);
-	debugText_->Printf("Life:%d", life);
+	//debugText_->SetPos(50, 100);
+	////debugText_->Printf("Life:%d", life);
 	//debugText_->Printf(
-	//  "Pos:(%f,%f,%f)", worldTransform_.translation_.x, worldTransform_.translation_.y,
-	//  worldTransform_.translation_.z);
+	//  "Pos:(%f,%f,%f)", worldTransform_.matWorld_.m[3][0], worldTransform_.matWorld_.m[3][1],
+	//  worldTransform_.matWorld_.m[3][2]);
 	
 	//debugText_->SetPos(50, 300);
 	//debugText_->Printf(
@@ -344,6 +353,12 @@ void Player::ReticleUpdate(ViewProjection viewProjection)
 		// スプライトの現在座標を取得
 		Vector2 spritePosition = sprite2DReticle_->GetPosition();
 
+		Vector2 ReticleLimitX = { 50,1230 };
+		Vector2 ReticleLimitY = { 40,680 };
+
+		Vector2 ReticleLimitMin;
+		Vector2 ReticleLimitMax;
+
 		XINPUT_STATE joyState;
 
 		// ジョイスティック状態取得
@@ -354,6 +369,8 @@ void Player::ReticleUpdate(ViewProjection viewProjection)
 			// スプライトの座標変更を反映
 			sprite2DReticle_->SetPosition(spritePosition);
 		}
+
+		
 
 		//POINT mousePosition;
 		// マウス座標（スクリーン座標を取得する）
@@ -397,6 +414,14 @@ void Player::ReticleUpdate(ViewProjection viewProjection)
 
 		worldTransform3DReticle_.translation_ = posNear + mouseDirection * kDistanceTestObject;
 
+		
+		//// 制限を超えない処理
+		//worldTransform3DReticle_.translation_.x = min(worldTransform3DReticle_.translation_.x, ReticleLimitX.x);
+		//worldTransform3DReticle_.translation_.x = max(worldTransform3DReticle_.translation_.x, ReticleLimitX.y);
+		//worldTransform3DReticle_.translation_.y = min(worldTransform3DReticle_.translation_.y, ReticleLimitY.x);
+		//worldTransform3DReticle_.translation_.y = max(worldTransform3DReticle_.translation_.y, ReticleLimitY.y);
+
+
 		// ワールド行列の更新と転送
 		trans.Affine_Trans(
 		  worldTransform3DReticle_.matWorld_, worldTransform3DReticle_.scale_,
@@ -405,12 +430,12 @@ void Player::ReticleUpdate(ViewProjection viewProjection)
 		worldTransform3DReticle_.TransferMatrix();
 
 		// デバッグテキスト
-		/*debugText_->SetPos(20, 200);
-		debugText_->Printf("Mouse ScreenPos:(%d,%d)", spritePosition.x, spritePosition.y);
-		debugText_->SetPos(20, 220);
-		debugText_->Printf("Near:(%f,%f,%f)", posNear.x, posNear.y, posNear.z);
-		debugText_->SetPos(20, 240);
-		debugText_->Printf("Far:(%f,%f,%f)", posFar.x, posFar.y, posFar.z);*/
+		//debugText_->SetPos(20, 200);
+		//debugText_->Printf("Mouse ScreenPos:(%f,%f)", spritePosition.x, spritePosition.y);
+		//debugText_->SetPos(20, 220);
+		//debugText_->Printf("Near:(%f,%f,%f)", posNear.x, posNear.y, posNear.z);
+		//debugText_->SetPos(20, 240);
+		//debugText_->Printf("Far:(%f,%f,%f)", posFar.x, posFar.y, posFar.z);*/
 	}
 
 	//debugText_->SetPos(20, 260);

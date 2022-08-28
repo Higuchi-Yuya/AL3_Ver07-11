@@ -34,14 +34,15 @@ void Enemy::Initialize(Model* model ,Vector3& position) {
 	worldTransform_.translation_ = {position.x, position.y, position.z};
 
 
-	enemy_initpos_z = worldTransform_.translation_.z;
+	enemy_initpos_ = worldTransform_.translation_;
 	//パターンを初期化
 	//pattern_ = Pattern::Straight;
 }
 
 void Enemy::Update() 
 {
-	if (isDead_==false) {
+	if (isDead_==false) 
+	{
 		//敵移動ベクトル
 		Vector3 move = { 0, 0, 0 };
 		switch (pattern_) {
@@ -72,12 +73,12 @@ void Enemy::Update()
 			break;
 
 		//パターン煽り
-		case Pattern::Provocation:
+		case Pattern::ProvocationWay5:
 			//フェーズ処理
 			switch (phase_) {
 			case Phase::Approach:
 			default:
-				Provocation_Update();
+				ProvocationWay5_Update();
 
 				break;
 
@@ -95,13 +96,86 @@ void Enemy::Update()
 
 			break;
 		
+		//パターン煽り(Way3)
+		case Pattern::ProvocationWay3:
+			//フェーズ処理
+			switch (phase_) {
+			case Phase::Approach:
+			default:
+				ProvocationWay3_Update();
+
+				break;
+
+			case Phase::Laeve:
+				Laeve_Update();
+				break;
+			}
+
+			trans->identity_matrix(worldTransform_.matWorld_);
+			trans->Affine_Trans(
+				worldTransform_.matWorld_, worldTransform_.scale_, worldTransform_.rotation_,
+				worldTransform_.translation_);
+
+			worldTransform_.TransferMatrix();
+
+			break;
+
+		//パターン煽り(Way5MoveX)
+		case Pattern::ProvocationWay5MoveX:
+			//フェーズ処理
+			switch (phase_) {
+			case Phase::Approach:
+			default:
+				ProvocationWay5MoveX_Update();
+
+				break;
+
+			case Phase::Laeve:
+				Laeve_Update();
+				break;
+			}
+
+			trans->identity_matrix(worldTransform_.matWorld_);
+			trans->Affine_Trans(
+				worldTransform_.matWorld_, worldTransform_.scale_, worldTransform_.rotation_,
+				worldTransform_.translation_);
+
+			worldTransform_.TransferMatrix();
+
+			break;
+
+		//パターン煽り(Way3MoveX)
+		case Pattern::ProvocationWay3MoveX:
+			//フェーズ処理
+			switch (phase_) {
+			case Phase::Approach:
+			default:
+				ProvocationWay3MoveX_Update();
+
+				break;
+
+			case Phase::Laeve:
+				Laeve_Update();
+				break;
+			}
+
+			trans->identity_matrix(worldTransform_.matWorld_);
+			trans->Affine_Trans(
+				worldTransform_.matWorld_, worldTransform_.scale_, worldTransform_.rotation_,
+				worldTransform_.translation_);
+
+			worldTransform_.TransferMatrix();
+
+			break;
 		}
 		
+
 	}
+
+}
 	
 
 
-}
 
 void Enemy::Draw(const ViewProjection& viewProjection) 
 {
@@ -154,7 +228,7 @@ void Enemy::Laeve_Update()
 	worldTransform_.translation_.y += move.y;
 }
 
-void Enemy::Provocation_Update()
+void Enemy::ProvocationWay5_Update()
 {
 	//敵移動ベクトル
 	Vector3 move = { 0, 0, 0 };
@@ -164,6 +238,8 @@ void Enemy::Provocation_Update()
 	//移動(ベクトルを加算)
 	move = { 0, 0, -enemy_speed_z };
 	worldTransform_.translation_.z += move.z;
+
+	
 
 	if (rotate_flag == true)
 	{
@@ -195,7 +271,187 @@ void Enemy::Provocation_Update()
 	//規定時間に到達したら
 	if (fireTimer_ <= 0) {
 		//弾を発射
-		WayFire();
+		Way5Fire();
+		//発射タイマーを初期化
+		fireTimer_ = kFireInterval;
+	}
+}
+
+void Enemy::ProvocationWay3_Update()
+{
+	//敵移動ベクトル
+	Vector3 move = { 0, 0, 0 };
+	// 回転ベクトル
+	Vector3 rotate = { 0,0,0 };
+
+	//移動(ベクトルを加算)
+	move = { 0, 0, -enemy_speed_z };
+	worldTransform_.translation_.z += move.z;
+	
+
+	if (rotate_flag == true)
+	{
+		// 回転ベクトルを加算
+		rotate = { 0,0,+enemy_rotation_speed.z };
+		worldTransform_.rotation_ += rotate;
+	}
+	else if (rotate_flag == false)
+	{
+		// 回転ベクトルを加算
+		rotate = { 0,0,-enemy_rotation_speed.z };
+		worldTransform_.rotation_ += rotate;
+	}
+	if (worldTransform_.rotation_.z >= 0.4) {
+		rotate_flag = false;
+	}
+	else if (worldTransform_.rotation_.z <= -0.4) {
+		rotate_flag = true;
+	}
+
+	//規定の位置に到達したら離脱
+	if (worldTransform_.translation_.z < player_->GetWorldPosition().z + 50) {
+		phase_ = Phase::Laeve;
+	}
+
+	//発射タイマーをデクリメント
+	fireTimer_--;
+
+	//規定時間に到達したら
+	if (fireTimer_ <= 0) {
+		//弾を発射
+		Way3Fire();
+		//発射タイマーを初期化
+		fireTimer_ = kFireInterval;
+	}
+}
+
+void Enemy::ProvocationWay5MoveX_Update()
+{
+	//敵移動ベクトル
+	Vector3 move = { 0, 0, 0 };
+	// 回転ベクトル
+	Vector3 rotate = { 0,0,0 };
+
+	//移動(ベクトルを加算)
+	move = { 0, 0, -enemy_speed_z };
+	worldTransform_.translation_.z += move.z;
+
+	if (moveXFlag == true)
+	{
+		move = { +enemy_speed_x,0,0 };
+		worldTransform_.translation_ += move;
+	}
+	else if (moveXFlag == false)
+	{
+		move = { -enemy_speed_x,0,0 };
+		worldTransform_.translation_ += move;
+	}
+	if (worldTransform_.translation_.x >= enemy_initpos_.x + enemy_limit_.x)
+	{
+		moveXFlag = false;
+	}
+	else if (worldTransform_.translation_.x <= enemy_initpos_.x + -enemy_limit_.x)
+	{
+		moveXFlag = true;
+	}
+
+	if (rotate_flag == true)
+	{
+		// 回転ベクトルを加算
+		rotate = { 0,0,+enemy_rotation_speed.z };
+		worldTransform_.rotation_ += rotate;
+	}
+	else if (rotate_flag == false)
+	{
+		// 回転ベクトルを加算
+		rotate = { 0,0,-enemy_rotation_speed.z };
+		worldTransform_.rotation_ += rotate;
+	}
+	if (worldTransform_.rotation_.z >= 0.4) {
+		rotate_flag = false;
+	}
+	else if (worldTransform_.rotation_.z <= -0.4) {
+		rotate_flag = true;
+	}
+
+	//規定の位置に到達したら離脱
+	if (worldTransform_.translation_.z < player_->GetWorldPosition().z + 50) {
+		phase_ = Phase::Laeve;
+	}
+
+	//発射タイマーをデクリメント
+	fireTimer_--;
+
+	//規定時間に到達したら
+	if (fireTimer_ <= 0) {
+		//弾を発射
+		Way5Fire();
+		//発射タイマーを初期化
+		fireTimer_ = kFireInterval;
+	}
+}
+
+void Enemy::ProvocationWay3MoveX_Update()
+{
+	//敵移動ベクトル
+	Vector3 move = { 0, 0, 0 };
+	// 回転ベクトル
+	Vector3 rotate = { 0,0,0 };
+
+	//移動(ベクトルを加算)
+	move = { 0, 0, -enemy_speed_z };
+	worldTransform_.translation_.z += move.z;
+
+	if (moveXFlag == true)
+	{
+		move = { +enemy_speed_x,0,0 };
+		worldTransform_.translation_ += move;
+	}
+	else if (moveXFlag == false)
+	{
+		move = { -enemy_speed_x,0,0 };
+		worldTransform_.translation_ += move;
+	}
+	if (worldTransform_.translation_.x >= enemy_initpos_.x + enemy_limit_.x)
+	{
+		moveXFlag = false;
+	}
+	else if (worldTransform_.translation_.x <= enemy_initpos_.x + -enemy_limit_.x)
+	{
+		moveXFlag = true;
+	}
+
+	if (rotate_flag == true)
+	{
+		// 回転ベクトルを加算
+		rotate = { 0,0,+enemy_rotation_speed.z };
+		worldTransform_.rotation_ += rotate;
+	}
+	else if (rotate_flag == false)
+	{
+		// 回転ベクトルを加算
+		rotate = { 0,0,-enemy_rotation_speed.z };
+		worldTransform_.rotation_ += rotate;
+	}
+	if (worldTransform_.rotation_.z >= 0.4) {
+		rotate_flag = false;
+	}
+	else if (worldTransform_.rotation_.z <= -0.4) {
+		rotate_flag = true;
+	}
+
+	//規定の位置に到達したら離脱
+	if (worldTransform_.translation_.z < player_->GetWorldPosition().z + 50) {
+		phase_ = Phase::Laeve;
+	}
+
+	//発射タイマーをデクリメント
+	fireTimer_--;
+
+	//規定時間に到達したら
+	if (fireTimer_ <= 0) {
+		//弾を発射
+		Way3Fire();
 		//発射タイマーを初期化
 		fireTimer_ = kFireInterval;
 	}
@@ -229,7 +485,7 @@ void Enemy::Fire() {
 	gameScene_->AddEnemyBullet(newBullet);
 }
 
-void Enemy::WayFire()
+void Enemy::Way5Fire()
 {
 	assert(player_);
 
@@ -272,6 +528,56 @@ void Enemy::WayFire()
 		std::make_unique<EnemyBullet>(),
 		std::make_unique<EnemyBullet>(),
 		std::make_unique<EnemyBullet>(),
+	};
+	for (int i = 0; i < bullet_size; i++)
+	{
+		newBullet[i]->Initialize(model_, worldTransform_, velocity[i]);
+
+		//弾を登録する
+		gameScene_->AddEnemyBullet(newBullet[i]);
+	}
+}
+
+void Enemy::Way3Fire()
+{
+	assert(player_);
+
+	//弾の速度
+	const float kBulletSpeed = 0.2f;
+	Affine_trans trans;
+	Vector3 enemy_pos = GetWorldPosition();
+	//Vector3 enemy_pos = worldTransform_.translation_;
+	const int bullet_size = 3;
+	Vector3 player_pos = player_->GetWorldPosition();
+	Vector3 velocity[bullet_size];
+	Vector3 rotation[bullet_size] =
+	{
+		{0,0,0},
+		{0,Rad(9),0},
+		{0,Rad(-9),0},
+	};
+	Matrix4 Rot[bullet_size];
+
+	for (int i = 0; i < bullet_size; i++)
+	{
+		velocity[i] = player_pos - enemy_pos;
+		trans.rotate(Rot[i], rotation[i]);
+
+		trans.Vec3conversion_W_Notincluded(velocity[i], Rot[i]);
+		velocity[i].normalize();
+		velocity[i] *= kBulletSpeed;
+	}
+
+	//速度ベクトルを自機の向きに合わせて回転させる
+	//velocity = velocity * worldTransform_.matWorld_;
+
+	//弾を生成し、初期化
+	std::unique_ptr<EnemyBullet> newBullet[bullet_size] =
+	{
+		std::make_unique<EnemyBullet>(),
+		std::make_unique<EnemyBullet>(),
+		std::make_unique<EnemyBullet>(),
+		
 	};
 	for (int i = 0; i < bullet_size; i++)
 	{

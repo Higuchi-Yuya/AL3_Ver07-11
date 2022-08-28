@@ -14,7 +14,10 @@ enum class Phase {
 
 enum class Pattern { 
 	Straight , //ただまっすぐに接近する
-	Provocation, //首を振る動きで煽りながら近づく
+	ProvocationWay5, //首を振る動きで煽りながら近づく(Way5)
+	ProvocationWay3,//首を振る動きで煽りながら近づく(Way3)
+	ProvocationWay5MoveX, //首を振る動きで煽りながら近づく(Way5)
+	ProvocationWay3MoveX,//首を振る動きで煽りながら近づく(Way3)
 };
 
 class Player;
@@ -43,7 +46,10 @@ class Enemy
 	void Laeve_Update();
 
 	//首振り接近フェーズ関連の関数
-	void Provocation_Update();
+	void ProvocationWay5_Update();
+	void ProvocationWay3_Update();
+	void ProvocationWay5MoveX_Update();
+	void ProvocationWay3MoveX_Update();
 
 	// 敵キャラに自キャラのアドレスを渡す
 	void SetPlayer(Player* player) { player_ = player; }
@@ -57,7 +63,8 @@ class Enemy
 
 	//弾の発射関数
 	void Fire();
-	void WayFire();
+	void Way5Fire();
+	void Way3Fire();
 	void HomingFire();
 
 	// ワールド座標を取得する
@@ -73,7 +80,7 @@ class Enemy
 
   public:
 	//発射間隔
-	static const int kFireInterval = 80;
+	static const int kFireInterval = 60;
   private:
 	//ワールド変換データ
 	WorldTransform worldTransform_;
@@ -83,19 +90,22 @@ class Enemy
 
 	float enemy_speed_x = 0.1f;
 	float enemy_speed_y = 0.1f;
-	float enemy_speed_z = 0.05f;
+	float enemy_speed_z = 0.1f;
 	
 	// 回転速度
 	Vector3 enemy_rotation_speed = { 0.005,0.005,0.002 };
 
 	//発射タイマー
-	int32_t fireTimer_ = 180;
+	int32_t fireTimer_ = 300;
 
 	//アフィン用
 	Affine_trans* trans = nullptr;
 
 	//デスフラグ
 	bool isDead_ = false;
+
+	//横移動フラグ
+	bool moveXFlag = true;
 
 	//回転フラグ
 	bool rotate_flag = true;
@@ -110,8 +120,8 @@ class Enemy
 	Pattern pattern_;
 
 	// 移動制限用変数
-	float enemy_initpos_z = 0;
-	float enemy_limit_z = 80;
+	Vector3 enemy_initpos_ = { 0,0,0 };
+	Vector3 enemy_limit_ = { 15,20,0 };
 
 	// 自キャラ
 	Player* player_ = nullptr;

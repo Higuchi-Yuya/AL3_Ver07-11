@@ -8,7 +8,11 @@
 
 const float Pi = 3.141593f;
 
-GameScene::GameScene() {}
+
+
+GameScene::GameScene()
+{
+}
 
 GameScene::~GameScene() {
 	delete debugCamera_;
@@ -311,12 +315,24 @@ void GameScene::UpdateEnemyPopCommands()
 			{
 			case 0:
 				enemys_.back()->SetEnemyPattern(Pattern::Straight);
-				
 				break;
+
 			case 1:
-				enemys_.back()->SetEnemyPattern(Pattern::Provocation);
-				
+				enemys_.back()->SetEnemyPattern(Pattern::ProvocationWay5);
 				break;
+
+			case 2:
+				enemys_.back()->SetEnemyPattern(Pattern::ProvocationWay3);
+				break;
+
+			case 3:
+				enemys_.back()->SetEnemyPattern(Pattern::ProvocationWay5MoveX);
+				break;
+
+			case 4:
+				enemys_.back()->SetEnemyPattern(Pattern::ProvocationWay3MoveX);
+				break;
+
 			}
 		}
 		// WAITコマンド
@@ -340,7 +356,7 @@ void GameScene::GameSceneInitialize()
 {
 	// カメラオブジェクトの初期化
 	cameraWorldTransform_.Initialize();
-	cameraWorldTransform_.translation_.z = -360.0f;
+	cameraWorldTransform_.translation_.z = -350.0f;
 
 	// レールカメラの初期化
 	railcamera_->Initialize(cameraWorldTransform_);
@@ -355,12 +371,149 @@ void GameScene::GameSceneInitialize()
 	enemyBullets_.clear();
 	ClearEnemyPopData();
 	LoadEnemyPopData();
+
+	// 音声リセット
+	gameSceneBgmFlag = true;
+
+	enemy_deadcount = 0;
+	score = 0;
+}
+
+void GameScene::Sprite_Initalize()
+{
+	titleNameTextureHandle_ = TextureManager::Load("Title_Texture/Title_name.png");
+	titleButtonTextureHandle_= TextureManager::Load("Title_Texture/Title_button.png");
+	flameTextureHandle_= TextureManager::Load("flame.png");
+	scoreF_TextureHandle_= TextureManager::Load("GameScene_Texture/score_moji.png");
+	LifeF_TextureHandle_= TextureManager::Load("GameScene_Texture/Life_moji.png");
+	result_flame_TextureHandle_ = TextureManager::Load("ResultScene_Texture/result_flame.png");
+	result_font_TextureHandle_= TextureManager::Load("ResultScene_Texture/result_moji.png");
+	result_score_font_TextureHandle_= TextureManager::Load("ResultScene_Texture/score_moji.png");
+	result_button_TextureHandle_= TextureManager::Load("ResultScene_Texture/result_button.png");
+	scene_change_TextureHandle_= TextureManager::Load("Scene_change.png");
+
+
+	pos__ = { 440,190 };
+	title_name_.reset(Sprite::Create(titleNameTextureHandle_, pos__, color, anker));
+	title_name_.get()->SetSize(Vector2{ 400,150 });
+
+	pos__ = { 550,480 };
+	title_button_.reset(Sprite::Create(titleButtonTextureHandle_, pos__, color, anker));
+	title_button_.get()->SetSize(Vector2{ 150,80 });
+
+	pos__ = { 0,0 };
+	flame_.reset(Sprite::Create(flameTextureHandle_, pos__, color, anker));
+
+	pos__ = { 942,55 };
+	ScoreF_.reset(Sprite::Create(scoreF_TextureHandle_, pos__, color, anker));
+	ScoreF_.get()->SetSize(Vector2{ 112,28 });
+
+	pos__ = { 100,55 };
+	LifeF_.reset(Sprite::Create(LifeF_TextureHandle_, pos__, color, anker));
+	LifeF_.get()->SetSize(Vector2{ 102,32 });
+
+	pos__ = { 0,0 };
+	result_flame_.reset(Sprite::Create(result_flame_TextureHandle_, pos__, color, anker));
+	
+	pos__ = { 535,132 };
+	result_font_.reset(Sprite::Create(result_font_TextureHandle_, pos__, color, anker));
+	result_font_.get()->SetSize(Vector2{ 206,43 });
+
+	pos__ = { 580,280 };
+	result_score_font_.reset(Sprite::Create(result_score_font_TextureHandle_, pos__, color, anker));
+	result_score_font_.get()->SetSize(Vector2{ 103,30 });
+
+	pos__ = { 535,510 };
+	result_button_.reset(Sprite::Create(result_button_TextureHandle_, pos__, color, anker));
+	result_button_.get()->SetSize(Vector2{ 192,44 });
+
+	scene_change_up_.reset(Sprite::Create(scene_change_TextureHandle_, sceneChangeUpPos, color, anker));
+
+	scene_change_down_.reset(Sprite::Create(scene_change_TextureHandle_, sceneChangeDownPos, color, anker));
+}
+
+void GameScene::TitleSpriteDraw()
+{
+	
+	title_name_.get()->Draw();
+	title_button_.get()->Draw();
+	
+	
+}
+
+void GameScene::GameSceneSpriteDraw()
+{
+	LifeF_.get()->Draw();
+	ScoreF_.get()->Draw();
+	
+}
+
+void GameScene::ResultSceneSpriteDraw()
+{
+	result_flame_.get()->Draw();
+	result_font_.get()->Draw();
+	result_score_font_.get()->Draw();
+	result_button_.get()->Draw();
+	
+}
+
+void GameScene::SceneChangeUpdate()
+{
+	// シーンチェンジフラグが立ってたら閉じる
+	if (scCloseFlag == true)
+	{
+		if (sceneChangeUpPos.y <= scUpDestinationPos.x)
+		{
+				sceneChangeUpPos.y += sceneChangeSpeed;
+				scene_change_up_.get()->SetPosition(sceneChangeUpPos);
+		}
+		if (sceneChangeDownPos.y >= scDownDestinationPos.x)
+		{
+				sceneChangeDownPos.y -= sceneChangeSpeed;
+				scene_change_down_.get()->SetPosition(sceneChangeDownPos);
+		}
+	}
+	
+	// 開くフラグが立ってたらあける
+	if (scOpenFlag == true)
+	{
+		if (sceneChangeUpPos.y >= scUpDestinationPos.y)
+		{
+			sceneChangeUpPos.y -= sceneChangeSpeed;
+			scene_change_up_.get()->SetPosition(sceneChangeUpPos);
+		}
+		if (sceneChangeDownPos.y <= scDownDestinationPos.y)
+		{
+			sceneChangeDownPos.y += sceneChangeSpeed;
+			scene_change_down_.get()->SetPosition(sceneChangeDownPos);
+		}
+
+		if (sceneChangeUpPos.y == scUpDestinationPos.y && sceneChangeDownPos.y == scDownDestinationPos.y)
+		{
+			scCloseFlag = false;
+			scOpenFlag = false;
+			
+		}
+	}
+}
+
+void GameScene::SceneChangeDraw()
+{
+	scene_change_up_.get()->Draw();
+	scene_change_down_.get()->Draw();
+}
+
+void GameScene::SoundInitalize()
+{
+
+	// サウンドデータの読み込み
+	titleBgmSDHandle_ = audio_->LoadWave("BGM/TitleBGM.wav");
+	gameSceneBgmSDHandle_ = audio_->LoadWave("BGM/gameScene.wav");
+	resultSceneBgmSDHandle_ = audio_->LoadWave("BGM/result.wav");
+	
 }
 
 void GameScene::Initialize() {
-
-	
-
 	// レティクルのテクスチャ
 	TextureManager::Load("2DReticle_500.png");
 
@@ -382,16 +535,9 @@ void GameScene::Initialize() {
 	// レールカメラの生成
 	railcamera_ = new RailCamera();
 
-	GameSceneInitialize();
+	
 
-	// 天球の初期化
-	skydome_->Initialize(modelSkydome_);
 
-	// スコアの描画の初期化
-	for (int i = 0; i < max_score_num; i++)
-	{
-		scoreSprite_[i].Initialize();
-	}
 
 	////カメラ視点座標を設定
 	// viewProjection_.eye = {Eye_x, Eye_y, Eye_z};
@@ -438,6 +584,25 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
 
+	// 音声データ読み込みの初期化
+	SoundInitalize();
+
+	GameSceneInitialize();
+
+	// 天球の初期化
+	skydome_->Initialize(modelSkydome_);
+
+	// スコアの描画の初期化
+	for (int i = 0; i < max_score_num; i++)
+	{
+		scoreSprite_[i].Initialize();
+		result_scoreSprite_[i].SetSize(resultScoreSize);
+		result_scoreSprite_[i].Initialize();
+	}
+	lifeNumSprite.Initialize();
+
+	// 2Dスプライトの初期化
+	Sprite_Initalize();
 
 
 #pragma region グリット線の描画の設定
@@ -477,16 +642,19 @@ void GameScene::Update() {
 #pragma region レールカメラの処理
 	railcamera_->Update();
 #pragma endregion
-	debugText_->SetPos(100, 150);
-	debugText_->Printf("Flag:%d", gamescene_flag);
-
+	//debugText_->SetPos(100, 150);
+	//debugText_->Printf("Flag:%d", gamescene_flag);
 
 	// ---------------スタートシーン-------------//
 	if (startscene_flag == true)
 	{
+		if (titleBgmFlag == true)
+		{
+			titleBgmVoiceHandle_ = audio_->PlayWave(titleBgmSDHandle_, true, 0.5);
+			titleBgmFlag = false;
+		}
 		railcamera_->SetcameraMoveFlag(false);
-
-
+		sceneChangeTimer--;
 
 		// ゲームパッドの状態を得る変数（XINPUT）
 		XINPUT_STATE joyState;
@@ -496,21 +664,39 @@ void GameScene::Update() {
 			return;
 		}
 		
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A)
+		if (sceneChangeTimer <= 0)
 		{
+			sceneChangeTimer = 0;
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A)
+			{
+				audio_->StopWave(titleBgmVoiceHandle_);
+				scCloseFlag = true;
+			}
+		}
+		
+		if (sceneChangeUpPos.y == 0 && sceneChangeDownPos.y == 360)
+		{
+			sceneChangeTimer = 120;
+			scCloseFlag = false;
+			scOpenFlag = true;
 			startscene_flag = false;
 			GameSceneInitialize();
 			gamescene_flag = true;
+			
 		}
-		
+		SceneChangeUpdate();
 	}
-
 
 	// ----------------ゲームシーン--------------//
 	if (gamescene_flag == true)
 	{
+		if (gameSceneBgmFlag == true)
+		{
+			gameSceneBgmVoiceHandle_ = audio_->PlayWave(gameSceneBgmSDHandle_, true,0.3);
+			gameSceneBgmFlag = false;
+		}
 		railcamera_->SetcameraMoveFlag(true);
-
+	
 		
 
 	#pragma region キャラクター移動処理
@@ -553,8 +739,7 @@ void GameScene::Update() {
 		//スコアの更新
 		score = 500 * enemy_deadcount;
 
-		debugText_->SetPos(100, 120);
-		debugText_->Printf("Score:%d", score); 
+
 	#pragma region レールカメラの処理
 			railcamera_->Update();
 	#pragma endregion
@@ -596,6 +781,8 @@ void GameScene::Update() {
 		//else {
 		//	viewProjection_.UpdateMatrix();
 		//	viewProjection_.TransferMatrix();
+		// debugText_->SetPos(100, 170);
+		// debugText_->Printf("pos:%f", player_->GetWorldPosition().z);
 		//}
 
 		//当たり判定
@@ -603,27 +790,37 @@ void GameScene::Update() {
 
 		//スコアの更新
 		score = 500 * enemy_deadcount;
-
-		debugText_->SetPos(100, 170);
-		debugText_->Printf("pos:%f", player_->GetWorldPosition().z);
-
-		if (player_->IsDead() == true || player_->GetWorldPosition().z >= 50)
-		{
-			gamescene_flag = false;
 		
-			resultscene_flag = true;
+		if (player_->IsDead() == true || player_->GetWorldPosition().z >= 85)
+		{
+			audio_->StopWave(gameSceneBgmVoiceHandle_);
+			scCloseFlag = true;
 		}
-	
-	}
+		if (sceneChangeUpPos.y == 0 && sceneChangeDownPos.y == 360)
+		{
+			scCloseFlag = false;
+			gamescene_flag = false;
+			resultSceneBgmFlag = true;
+			resultscene_flag = true;
+			scOpenFlag = true;
+		}
+		SceneChangeUpdate();
 
+		//debugText_->SetPos(100, 120);
+		//debugText_->Printf("Score:%d", score); 
+	}
+	
 	//------------リザルトシーン---------------//
 	if (resultscene_flag == true)
 	{
+		if (resultSceneBgmFlag == true)
+		{
+			resultSceneBgmVoiceHandle_ = audio_->PlayWave(resultSceneBgmSDHandle_, true, 0.3);
+			resultSceneBgmFlag = false;
+		}
+		sceneChangeTimer--;
 		railcamera_->SetcameraMoveFlag(false);
 
-		debugText_->SetPos(100, 120);
-
-		debugText_->Printf("Score:%d", score);
 
 		// ゲームパッドの状態を得る変数（XINPUT）
 		XINPUT_STATE joyState;
@@ -633,16 +830,33 @@ void GameScene::Update() {
 			return;
 		}
 
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)
+		if (sceneChangeTimer <= 0)
 		{
+			sceneChangeTimer = 0;
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)
+			{
+				audio_->StopWave(resultSceneBgmVoiceHandle_);
+				scCloseFlag = true;
+			}
+		}
+
+		if (sceneChangeUpPos.y == 0 && sceneChangeDownPos.y == 360)
+		{
+			sceneChangeTimer = 120;
+			scCloseFlag = false;
 			resultscene_flag = false;
 			// カメラオブジェクトの初期化
 			cameraWorldTransform_.Initialize();
 			cameraWorldTransform_.translation_.z = -360.0f;
 			// レールカメラの初期化
 			railcamera_->Initialize(cameraWorldTransform_);
+			//音声リセット
+			titleBgmFlag = true;
+
 			startscene_flag = true;
+			scOpenFlag = true;
 		}
+		SceneChangeUpdate();
 	}
 }
 
@@ -686,12 +900,7 @@ void GameScene::Draw() {
 			enemy->Draw(railcamera_->GetViewProjection());
 		}
 		EnemyBulletDraw();
-
-		
 	}
-	
-
-
 
 	//ライン描画が参照するビュープロジェクションを指定する
 
@@ -715,22 +924,58 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	
+	if (startscene_flag == true)
+	{
+		TitleSpriteDraw();
+		
+	}
+
 	if (gamescene_flag == true)
 	{
 		player_->DrawUI();
+		div_score = 10;
+		life_ = player_->Life();
+		if (life_ <= 0)
+		{
+			life_ = 0;
+		}
+		for (int i = 0; i < max_life_num; i++)
+		{
+			life_num = life_ % div_score / (div_score / 10);
+			div_score = div_score / 10;
+			lifeNumPos.x = 230 - ((1 - i) * 18);
+			lifeNumSprite.Draw(life_num, lifeNumPos);
 
+		}
+
+		GameSceneSpriteDraw();
+		div_score = 100000;
+		for (int i = 0; i < max_score_num; i++)
+		{
+			score_num[i] = score % div_score / (div_score / 10);
+			div_score = div_score / 10;
+			pos.x = 1080 - ((1 - i) * 18);
+			scoreSprite_[i].Draw(score_num[i], pos);
+
+		}
 		
 	}
-	div_score = 100000;
-	for (int i = 0; i < max_score_num; i++)
+	if (resultscene_flag == true)
 	{
-		score_num[i] = score % div_score / (div_score / 10);
-		div_score = div_score / 10;
-		pos.x = 800 - ((1 - i) * 32);
-		scoreSprite_[i].Draw(score_num[i],pos);
-		
-	}
+		ResultSceneSpriteDraw();
+		div_score = 100000;
+		for (int i = 0; i < max_score_num; i++)
+		{
+			score_num[i] = score % div_score / (div_score / 10);
+			div_score = div_score / 10;
+			resultScorePos.x = 580 - ((1 - i) * resultScoreSize.x);
+			result_scoreSprite_[i].Draw(score_num[i], resultScorePos);
 
+		}
+	}
+	SceneChangeDraw();
+	flame_.get()->Draw();
 	/*for (int i = 0; i < max_score_num; i++)
 	{
 		pos_[i].x = 800 - (i * texsize.x);

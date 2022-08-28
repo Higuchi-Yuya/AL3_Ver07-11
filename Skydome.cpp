@@ -10,9 +10,10 @@ void Skydome::Initialize(Model* model)
 	textureHandle_ = TextureManager::Load("skydome/Nebura.jpg");
 	//ƒ[ƒ‹ƒh•ÏŠ·‚ğ‰Šú‰»
 	worldTransform_.Initialize();
-	worldTransform_.scale_.x = 250.0f;
-	worldTransform_.scale_.y = 250.0f;
-	worldTransform_.scale_.z = 250.0f;
+	worldTransform_.scale_.x = 500.0f;
+	worldTransform_.scale_.y = 500.0f;
+	worldTransform_.scale_.z = 500.0f;
+	worldTransform_.rotation_.y = 1.0f;
 }
 
 void Skydome::Update() 
